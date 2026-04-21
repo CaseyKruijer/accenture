@@ -1,7 +1,7 @@
 package nl.accenture.holidays_assignment.controlers;
 
 import lombok.RequiredArgsConstructor;
-import nl.accenture.holidays_assignment.modals.Holiday;
+import nl.accenture.holidays_assignment.response.HolidayResponse;
 import org.springframework.web.bind.annotation.*;
 import nl.accenture.holidays_assignment.services.HolidayService;
 
@@ -12,12 +12,9 @@ public class HolidayController {
     private final HolidayService holidayService;
 
     @GetMapping("/{country}")
-    public Holiday[] getHolidays(
-            @PathVariable String country,
-            @RequestParam(required = false) Integer year
-    ) throws Exception {
-        int resolvedYear = (year != null) ? year : java.time.Year.now().getValue();
-
-        return holidayService.getHolidays(resolvedYear, country);
+    public HolidayResponse[] getLastThreeCelebratedHolidays(@PathVariable String country) throws Exception {
+        return holidayService.getLastThreeCelebratedHolidays(country);
     }
+
+
 }

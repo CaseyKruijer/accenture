@@ -1,5 +1,6 @@
 package nl.accenture.holidays_assignment.modals;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
