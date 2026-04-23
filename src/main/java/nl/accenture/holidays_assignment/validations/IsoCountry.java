@@ -1,9 +1,9 @@
-package nl.accenture.holidays_assignment.validation;
+package nl.accenture.holidays_assignment.validations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import nl.accenture.holidays_assignment.constants.ErrorMessages;
-import nl.accenture.holidays_assignment.validator.IsoCountryValidator;
+import nl.accenture.holidays_assignment.validators.IsoCountryValidator;
 
 import java.lang.annotation.*;
 

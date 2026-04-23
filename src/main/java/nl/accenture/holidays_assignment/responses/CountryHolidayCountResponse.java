@@ -1,4 +1,4 @@
-package nl.accenture.holidays_assignment.response;
+package nl.accenture.holidays_assignment.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

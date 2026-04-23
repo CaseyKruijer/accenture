@@ -1,15 +1,15 @@
 package nl.accenture.holidays_assignment.controlers;
 
 import lombok.RequiredArgsConstructor;
-import nl.accenture.holidays_assignment.response.CountryHolidayCountResponse;
-import nl.accenture.holidays_assignment.response.HolidayResponse;
-import nl.accenture.holidays_assignment.response.SharedHolidayResponse;
-import nl.accenture.holidays_assignment.validation.IsoCountry;
-import nl.accenture.holidays_assignment.validation.ValidYearRange;
+import nl.accenture.holidays_assignment.responses.CountryHolidayCountResponse;
+import nl.accenture.holidays_assignment.responses.HolidayResponse;
+import nl.accenture.holidays_assignment.responses.SharedHolidayResponse;
+import nl.accenture.holidays_assignment.services.HolidayService;
+import nl.accenture.holidays_assignment.validations.IsoCountry;
+import nl.accenture.holidays_assignment.validations.ValidYearRange;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import nl.accenture.holidays_assignment.services.HolidayService;
 
 import java.util.List;
 

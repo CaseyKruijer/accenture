@@ -1,8 +1,8 @@
-package nl.accenture.holidays_assignment.validator;
+package nl.accenture.holidays_assignment.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import nl.accenture.holidays_assignment.validation.ValidYearRange;
+import nl.accenture.holidays_assignment.validations.ValidYearRange;
 
 import java.util.Calendar;
 

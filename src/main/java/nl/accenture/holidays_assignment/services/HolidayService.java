@@ -1,29 +1,27 @@
 package nl.accenture.holidays_assignment.services;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import nl.accenture.holidays_assignment.constants.ErrorMessages;
 import nl.accenture.holidays_assignment.modals.Holiday;
-import nl.accenture.holidays_assignment.response.CountryHolidayCountResponse;
-import nl.accenture.holidays_assignment.response.HolidayResponse;
-import nl.accenture.holidays_assignment.response.SharedHolidayResponse;
+import nl.accenture.holidays_assignment.providers.HolidayProvider;
+import nl.accenture.holidays_assignment.responses.CountryHolidayCountResponse;
+import nl.accenture.holidays_assignment.responses.HolidayResponse;
+import nl.accenture.holidays_assignment.responses.SharedHolidayResponse;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Log4j2
+@AllArgsConstructor
 public class HolidayService {
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final String BASEURL = "https://date.nager.at/api/v3/PublicHolidays/";
+    private HolidayProvider holidayProvider;
 
     /**
      * Retrieves the three most recent holidays that have already occurred in the current year
@@ -34,7 +32,7 @@ public class HolidayService {
      */
     public List<HolidayResponse> getLastThreeCelebratedHolidays(String countryCode) {
         LocalDate today = LocalDate.now();
-        List<Holiday> holidays = getHolidays(countryCode, today.getYear());
+        List<Holiday> holidays = holidayProvider.getHolidays(countryCode, today.getYear());
 
         return holidays.stream()
                 .filter(h-> h.getDate().isBefore(today))
@@ -56,7 +54,7 @@ public class HolidayService {
         return countryCodes.stream()
                 .map(code -> {
                     try {
-                        List<Holiday> holidays = getHolidays(code, year);
+                        List<Holiday> holidays = holidayProvider.getHolidays(code, year);
 
                         long count = holidays.stream()
                                 .filter(h -> {
@@ -83,8 +81,8 @@ public class HolidayService {
      * @return a list of {@link SharedHolidayResponse} objects, if none occur return an empty list
      */
     public List<SharedHolidayResponse> getSharedHolidays(String countryCode1, String countryCode2, int year) {
-        List<Holiday> holidays1 = getHolidays(countryCode1, year);
-        List<Holiday> holidays2 = getHolidays(countryCode2, year);
+        List<Holiday> holidays1 = holidayProvider.getHolidays(countryCode1, year);
+        List<Holiday> holidays2 = holidayProvider.getHolidays(countryCode2, year);
 
         Map<LocalDate, Holiday> mapHoliday = holidays1.stream()
                 .collect(Collectors.toMap(Holiday::getDate, h ->h));
@@ -103,31 +101,5 @@ public class HolidayService {
                         ),
                         m -> new ArrayList<>(m.values())
                 ));
-    }
-
-    /**
-     * Retrieves all public holidays for a given country and year from the external holiday API.
-     *
-     * @param countryCode the country code
-     * @param year the year for which the holidays should be retrieved
-     * @return a list of {@link Holiday}
-     */
-    private List<Holiday> getHolidays(String countryCode, int year) {
-        try {
-            String url =  BASEURL + year + "/" + countryCode;
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            Holiday[] holidays = mapper.readValue(response.body(), Holiday[].class);
-
-            return Arrays.asList(holidays);
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            throw new RuntimeException(ErrorMessages.API_FAILED);
-        }
     }
 }
