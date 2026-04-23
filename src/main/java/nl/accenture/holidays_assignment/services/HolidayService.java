@@ -1,5 +1,7 @@
 package nl.accenture.holidays_assignment.services;
 
+import lombok.extern.log4j.Log4j2;
+import nl.accenture.holidays_assignment.constants.ErrorMessages;
 import nl.accenture.holidays_assignment.modals.Holiday;
 import nl.accenture.holidays_assignment.response.CountryHolidayCountResponse;
 import nl.accenture.holidays_assignment.response.HolidayResponse;
@@ -17,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class HolidayService {
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -30,7 +33,7 @@ public class HolidayService {
      * @return a list of up to three {@link HolidayResponse}
      * @throws Exception if an error occurs while retrieving holiday data
      */
-    public List<HolidayResponse> getLastThreeCelebratedHolidays(String countryCode) throws Exception {
+    public List<HolidayResponse> getLastThreeCelebratedHolidays(String countryCode) {
         LocalDate today = LocalDate.now();
         List<Holiday> holidays = getHolidays(countryCode, today.getYear());
 
@@ -51,7 +54,7 @@ public class HolidayService {
      * @return a list of {@link CountryHolidayCountResponse}
      * @throws Exception if an error occurs while retrieving holiday data
      */
-    public List<CountryHolidayCountResponse> getHolidayCounts(List<String> countryCodes, int year) throws Exception {
+    public List<CountryHolidayCountResponse> getHolidayCounts(List<String> countryCodes, int year) {
         return countryCodes.stream()
                 .map(code -> {
                     try {
@@ -82,7 +85,7 @@ public class HolidayService {
      * @return a list of {@link SharedHolidayResponse} objects, if none occur return an empty list
      * @throws Exception if an error occurs while retrieving holiday data
      */
-    public List<SharedHolidayResponse> getSharedHolidays(String countryCode1, String countryCode2, int year) throws Exception {
+    public List<SharedHolidayResponse> getSharedHolidays(String countryCode1, String countryCode2, int year) {
         List<Holiday> holidays1 = getHolidays(countryCode1, year);
         List<Holiday> holidays2 = getHolidays(countryCode2, year);
 
@@ -113,17 +116,22 @@ public class HolidayService {
      * @return a list of {@link Holiday}
      * @throws Exception if an error occurs while retrieving holiday data
      */
-    private List<Holiday> getHolidays(String countryCode, int year) throws Exception {
-        String url =  BASEURL + year + "/" + countryCode;
+    private List<Holiday> getHolidays(String countryCode, int year) {
+        try {
+            String url =  BASEURL + year + "/" + countryCode;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        Holiday[] holidays = mapper.readValue(response.body(), Holiday[].class);
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            Holiday[] holidays = mapper.readValue(response.body(), Holiday[].class);
 
-        return Arrays.asList(holidays);
+            return Arrays.asList(holidays);
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            throw new RuntimeException(ErrorMessages.API_FAILED);
+        }
     }
 }

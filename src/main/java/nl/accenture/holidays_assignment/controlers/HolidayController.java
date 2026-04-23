@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import nl.accenture.holidays_assignment.response.CountryHolidayCountResponse;
 import nl.accenture.holidays_assignment.response.HolidayResponse;
 import nl.accenture.holidays_assignment.response.SharedHolidayResponse;
+import nl.accenture.holidays_assignment.validation.IsoCountry;
+import nl.accenture.holidays_assignment.validation.ValidYearRange;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import nl.accenture.holidays_assignment.services.HolidayService;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/holidays")
 @RequiredArgsConstructor
@@ -16,23 +21,25 @@ public class HolidayController {
     private final HolidayService holidayService;
 
     @GetMapping("/{countryCode}/last3")
-    public List<HolidayResponse> getLastThreeCelebratedHolidays(@PathVariable String countryCode) throws Exception {
-        return holidayService.getLastThreeCelebratedHolidays(countryCode);
+    public ResponseEntity<List<HolidayResponse>> getLastThreeCelebratedHolidays(
+            @PathVariable @IsoCountry String countryCode
+    ) {
+        return ResponseEntity.ok(holidayService.getLastThreeCelebratedHolidays(countryCode));
     }
 
-    @GetMapping("/{counts}")
-    public List<CountryHolidayCountResponse> getCountOfHolidaysNotOnWeekend(
-            @RequestParam List<String> countryCode,
-            @RequestParam int year) throws Exception {
-        return holidayService.getHolidayCounts(countryCode, year);
+    @GetMapping("/counts")
+    public ResponseEntity<List<CountryHolidayCountResponse>> getCountOfHolidaysNotOnWeekend(
+            @RequestParam List<@IsoCountry String> countryCodes,
+            @RequestParam @ValidYearRange int year) {
+        return ResponseEntity.ok(holidayService.getHolidayCounts(countryCodes, year));
     }
 
     @GetMapping("/shared")
-    public List<SharedHolidayResponse> getSharedHolidays(
-            @RequestParam String countryCode1,
-            @RequestParam String countryCode2,
-            @RequestParam int year
-    ) throws Exception {
-        return holidayService.getSharedHolidays(countryCode1, countryCode2, year);
+    public ResponseEntity<List<SharedHolidayResponse>> getSharedHolidays(
+            @RequestParam @IsoCountry String countryCode1,
+            @RequestParam @IsoCountry String countryCode2,
+            @RequestParam @ValidYearRange int year
+    ) {
+        return ResponseEntity.ok(holidayService.getSharedHolidays(countryCode1, countryCode2, year));
     }
 }
