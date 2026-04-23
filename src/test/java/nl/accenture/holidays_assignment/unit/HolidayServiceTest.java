@@ -22,13 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HolidayTest {
+public class HolidayServiceTest {
     @Mock
     private HolidayProvider holidayProvider;
     @InjectMocks
     private HolidayService holidayService;
-
-    static Stream<Arguments> holidayCases() {
+    static Stream<Arguments> getLastThreeCelebratedHolidaysCases() {
         LocalDate today = LocalDate.of(2026, 4, 23);
 
         return Stream.of(
@@ -49,8 +48,8 @@ public class HolidayTest {
     }
 
     @ParameterizedTest
-    @MethodSource("holidayCases")
-    void shouldReturnCorrectLastThreeHolidays(String countryCode, LocalDate today, List<Holiday> mockHolidays, int expectedSize) {
+    @MethodSource("getLastThreeCelebratedHolidaysCases")
+    void get_correct_last_three_holidays(String countryCode, LocalDate today, List<Holiday> mockHolidays, int expectedSize) {
         when(holidayProvider.getHolidays(countryCode, today.getYear()))
                 .thenReturn(mockHolidays);
 
@@ -68,7 +67,7 @@ public class HolidayTest {
         }
     }
 
-    static Stream<org.junit.jupiter.params.provider.Arguments> holidayCountCases() {
+    static Stream<org.junit.jupiter.params.provider.Arguments> HolidayCountCases() {
         int year = 2026;
 
         return Stream.of(
@@ -83,13 +82,8 @@ public class HolidayTest {
     }
 
     @ParameterizedTest
-    @MethodSource("holidayCountCases")
-    void shouldReturnCorrectHolidayCounts(
-            List<String> countryCodes,
-            int year,
-            List<Holiday> holidays,
-            List<Long> expectedCounts
-    ) {
+    @MethodSource("HolidayCountCases")
+    void get_correct_holiday_counts(List<String> countryCodes, int year, List<Holiday> holidays, List<Long> expectedCounts) {
 
         for (String code : countryCodes) {
             when(holidayProvider.getHolidays(code, year))
@@ -116,7 +110,7 @@ public class HolidayTest {
         assertTrue(actualCounts.containsAll(expectedCounts));
     }
 
-    static Stream<Arguments> sharedHolidayCases() {
+    static Stream<Arguments> SharedHolidayCases() {
         LocalDate base = LocalDate.of(2026, 1, 1);
 
         return Stream.of(
@@ -143,8 +137,8 @@ public class HolidayTest {
     }
 
     @ParameterizedTest
-    @MethodSource("sharedHolidayCases")
-    void shouldReturnSharedHolidays(String country1, String country2, int year, List<Holiday> holidays1, List<Holiday> holidays2, int expectedSize) {
+    @MethodSource("SharedHolidayCases")
+    void get_shared_holidays(String country1, String country2, int year, List<Holiday> holidays1, List<Holiday> holidays2, int expectedSize) {
         when(holidayProvider.getHolidays(country1, year))
                 .thenReturn(holidays1);
 
