@@ -23,11 +23,12 @@ public class HolidayService {
     private final String BASEURL = "https://date.nager.at/api/v3/PublicHolidays/";
 
     /**
-     * Based on the given landcode, you will get an array of the last 3 celebrated holidays
+     * Retrieves the three most recent holidays that have already occurred in the current year
+     * for the given country.
      *
-     * @param countryCode the land code
-     * @return list of the last 3 holidays celebrated
-     * @throws Exception
+     * @param countryCode the country code
+     * @return a list of up to three {@link HolidayResponse}
+     * @throws Exception if an error occurs while retrieving holiday data
      */
     public List<HolidayResponse> getLastThreeCelebratedHolidays(String countryCode) throws Exception {
         LocalDate today = LocalDate.now();
@@ -42,12 +43,13 @@ public class HolidayService {
     }
 
     /**
-     * search for every country code, all the public holidays where the date is not on a weekend saturday or sunday
+     * Calculates the number of public holidays that fall on weekdays (Monday-Friday)
+     * for each given country in a specific year.
      *
-     * @param countryCodes list with all the countrycodes to search in
-     * @param year year to search
-     * @return list of {@link CountryHolidayCountResponse}
-     * @throws Exception
+     * @param countryCodes list of country codes
+     * @param year the year for witch the holidays should be counted
+     * @return a list of {@link CountryHolidayCountResponse}
+     * @throws Exception if an error occurs while retrieving holiday data
      */
     public List<CountryHolidayCountResponse> getHolidayCounts(List<String> countryCodes, int year) throws Exception {
         return countryCodes.stream()
@@ -70,6 +72,16 @@ public class HolidayService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all holidays that occur on the same date in two given countries for a specific year.
+     * The method compares the holiday calendars of both countries and returns a list of shared holidays
+     *
+     * @param countryCode1 the country code of the first country
+     * @param countryCode2 the country code of the second country
+     * @param year the year for which the holidays should be retrieved
+     * @return a list of {@link SharedHolidayResponse} objects, if none occur return an empty list
+     * @throws Exception if an error occurs while retrieving holiday data
+     */
     public List<SharedHolidayResponse> getSharedHolidays(String countryCode1, String countryCode2, int year) throws Exception {
         List<Holiday> holidays1 = getHolidays(countryCode1, year);
         List<Holiday> holidays2 = getHolidays(countryCode2, year);
@@ -94,11 +106,12 @@ public class HolidayService {
     }
 
     /**
-     * Get all the holidays from the given country in the given year
+     * Retrieves all public holidays for a given country and year from the external holiday API.
      *
-     * @param countryCode Code of a land from what holidays you want to know
-     * @return a list of {@link Holiday}s
-     * @throws Exception
+     * @param countryCode the country code
+     * @param year the year for which the holidays should be retrieved
+     * @return a list of {@link Holiday}
+     * @throws Exception if an error occurs while retrieving holiday data
      */
     private List<Holiday> getHolidays(String countryCode, int year) throws Exception {
         String url =  BASEURL + year + "/" + countryCode;
