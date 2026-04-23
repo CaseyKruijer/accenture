@@ -3,6 +3,7 @@ package nl.accenture.holidays_assignment.controlers;
 import lombok.RequiredArgsConstructor;
 import nl.accenture.holidays_assignment.response.CountryHolidayCountResponse;
 import nl.accenture.holidays_assignment.response.HolidayResponse;
+import nl.accenture.holidays_assignment.response.SharedHolidayResponse;
 import org.springframework.web.bind.annotation.*;
 import nl.accenture.holidays_assignment.services.HolidayService;
 
@@ -24,5 +25,14 @@ public class HolidayController {
             @RequestParam List<String> countryCode,
             @RequestParam int year) throws Exception {
         return holidayService.getHolidayCounts(countryCode, year);
+    }
+
+    @GetMapping("/shared")
+    public List<SharedHolidayResponse> getSharedHolidays(
+            @RequestParam String countryCode1,
+            @RequestParam String countryCode2,
+            @RequestParam int year
+    ) throws Exception {
+        return holidayService.getSharedHolidays(countryCode1, countryCode2, year);
     }
 }

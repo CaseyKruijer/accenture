@@ -3,6 +3,7 @@ package nl.accenture.holidays_assignment.services;
 import nl.accenture.holidays_assignment.modals.Holiday;
 import nl.accenture.holidays_assignment.response.CountryHolidayCountResponse;
 import nl.accenture.holidays_assignment.response.HolidayResponse;
+import nl.accenture.holidays_assignment.response.SharedHolidayResponse;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -12,9 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +68,29 @@ public class HolidayService {
                     }
                 }).sorted(Comparator.comparingLong(CountryHolidayCountResponse::getCount).reversed())
                 .collect(Collectors.toList());
+    }
+
+    public List<SharedHolidayResponse> getSharedHolidays(String countryCode1, String countryCode2, int year) throws Exception {
+        List<Holiday> holidays1 = getHolidays(countryCode1, year);
+        List<Holiday> holidays2 = getHolidays(countryCode2, year);
+
+        Map<LocalDate, Holiday> mapHoliday = holidays1.stream()
+                .collect(Collectors.toMap(Holiday::getDate, h ->h));
+
+        return holidays2.stream()
+                .filter(h -> mapHoliday.containsKey(h.getDate()))
+                .map(h -> {
+                    Holiday holiday = mapHoliday.get(h.getDate());
+
+                    return new SharedHolidayResponse(h.getDate(), List.of(holiday.getLocalName(), h.getLocalName()));
+                }).collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                SharedHolidayResponse::getDate,
+                                r -> r,
+                                (r1, r2) -> r1
+                        ),
+                        m -> new ArrayList<>(m.values())
+                ));
     }
 
     /**
