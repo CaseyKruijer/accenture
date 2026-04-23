@@ -31,7 +31,6 @@ public class HolidayService {
      *
      * @param countryCode the country code
      * @return a list of up to three {@link HolidayResponse}
-     * @throws Exception if an error occurs while retrieving holiday data
      */
     public List<HolidayResponse> getLastThreeCelebratedHolidays(String countryCode) {
         LocalDate today = LocalDate.now();
@@ -52,7 +51,6 @@ public class HolidayService {
      * @param countryCodes list of country codes
      * @param year the year for witch the holidays should be counted
      * @return a list of {@link CountryHolidayCountResponse}
-     * @throws Exception if an error occurs while retrieving holiday data
      */
     public List<CountryHolidayCountResponse> getHolidayCounts(List<String> countryCodes, int year) {
         return countryCodes.stream()
@@ -83,7 +81,6 @@ public class HolidayService {
      * @param countryCode2 the country code of the second country
      * @param year the year for which the holidays should be retrieved
      * @return a list of {@link SharedHolidayResponse} objects, if none occur return an empty list
-     * @throws Exception if an error occurs while retrieving holiday data
      */
     public List<SharedHolidayResponse> getSharedHolidays(String countryCode1, String countryCode2, int year) {
         List<Holiday> holidays1 = getHolidays(countryCode1, year);
@@ -114,7 +111,6 @@ public class HolidayService {
      * @param countryCode the country code
      * @param year the year for which the holidays should be retrieved
      * @return a list of {@link Holiday}
-     * @throws Exception if an error occurs while retrieving holiday data
      */
     private List<Holiday> getHolidays(String countryCode, int year) {
         try {
